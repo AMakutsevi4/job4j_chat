@@ -39,6 +39,10 @@ public class ChatService {
         return personRepository.save(person);
     }
 
+    public Person findByUserName(String name) {
+        return personRepository.login(name);
+    }
+
     public Person findByIdPerson(int id) {
         return personRepository.findById(id).orElse(null);
     }

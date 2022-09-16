@@ -22,13 +22,24 @@ public class PersonController {
 
     @PostMapping("/sign-up")
     public void signUp(@RequestBody Person person) {
+        if (chatService.findByUserName(person.getLogin()) != null) {
+            throw new IllegalArgumentException("Пользователь с таким именем уже существует");
+        }
         person.setPassword(encoder.encode(person.getPassword()));
         chatService.savePerson(person);
     }
 
     @PostMapping()
     public Person create(@RequestBody Person person) {
-        return chatService.savePerson(person);
+        if (chatService.findByUserName(person.getLogin()) != null) {
+            throw new IllegalArgumentException("Пользователь с таким именем уже существует");
+        }
+        try {
+            return chatService.savePerson(person);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Проверьте правильность заполнения имени");
+        }
+
     }
 
     @GetMapping("/")
@@ -37,11 +48,15 @@ public class PersonController {
     }
 
     @GetMapping("/{id}")
-    public Person findPersonById(@RequestParam int id) {
-        return chatService.findByIdPerson(id);
+    public Person findPersonById(@PathVariable int id) {
+        try {
+            return chatService.findByIdPerson(id);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Пользователь не найден");
+        }
     }
 
-    @DeleteMapping("/person/{id}")
+    @DeleteMapping("/drop/{id}")
     public void deletePerson(@PathVariable int id) {
         chatService.deletePerson(id);
     }

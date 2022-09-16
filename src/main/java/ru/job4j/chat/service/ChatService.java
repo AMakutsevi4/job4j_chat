@@ -1,6 +1,5 @@
 package ru.job4j.chat.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.job4j.chat.model.Message;
 import ru.job4j.chat.model.Person;
@@ -13,19 +12,10 @@ import ru.job4j.chat.repository.RoomRepository;
 import java.util.List;
 
 @Service
-public class ChatService {
-
-    @Autowired
-    MessageRepository messageRepository;
-
-    @Autowired
-    private PersonRepository personRepository;
-
-    @Autowired
-    RoleRepository roleRepository;
-
-    @Autowired
-    private RoomRepository roomRepository;
+public record ChatService(MessageRepository messageRepository,
+                          PersonRepository personRepository,
+                          RoleRepository roleRepository,
+                          RoomRepository roomRepository) {
 
     public Message saveMessage(Message message) {
         return messageRepository.save(message);
@@ -48,9 +38,10 @@ public class ChatService {
     }
 
     public void deletePerson(int id) {
-        Person person = new Person();
-        person.setId(id);
-        personRepository.delete(person);
+        if (findByIdPerson(id) == null) {
+            throw new IllegalArgumentException("Данного пользователя не существует");
+        }
+        personRepository.delete(findByIdPerson(id));
     }
 
     public Room saveRoom(Room room) {

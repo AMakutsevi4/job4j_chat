@@ -19,6 +19,9 @@ public class MessageController {
 
     @PostMapping
     public Message createMessage(@RequestBody Message message) {
+        if (message.getText() == null) {
+            throw new NullPointerException("Нельзя отправлять пустоее сообщение");
+        }
         return chatService.saveMessage(message);
 
     }

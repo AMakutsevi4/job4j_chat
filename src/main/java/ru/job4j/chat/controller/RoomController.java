@@ -19,6 +19,9 @@ public class RoomController {
 
     @PostMapping
     public Room createRoom(@RequestBody Room room) {
+        if (room.getName() == null) {
+            throw new NullPointerException("Не указано название комнаты");
+        }
         return chatService.saveRoom(room);
     }
 }

@@ -1,5 +1,7 @@
 package ru.job4j.chat.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.chat.model.Person;
@@ -30,34 +32,37 @@ public class PersonController {
     }
 
     @PostMapping()
-    public Person create(@RequestBody Person person) {
+    public ResponseEntity<Person> create(@RequestBody Person person) {
         if (chatService.findByUserName(person.getLogin()) != null) {
             throw new IllegalArgumentException("Пользователь с таким именем уже существует");
         }
         try {
-            return chatService.savePerson(person);
+            chatService.savePerson(person);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception e) {
             throw new IllegalArgumentException("Проверьте правильность заполнения имени");
         }
-
     }
 
     @GetMapping("/")
-    public List<Person> findAll() {
-        return chatService.findAllPerson();
+    public ResponseEntity<Person> findAll() {
+        chatService.findAllPerson();
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public Person findPersonById(@PathVariable int id) {
+    public ResponseEntity<Person> findPersonById(@PathVariable int id) {
         try {
-            return chatService.findByIdPerson(id);
+            chatService.findByIdPerson(id);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             throw new IllegalArgumentException("Пользователь не найден");
         }
     }
 
     @DeleteMapping("/drop/{id}")
-    public void deletePerson(@PathVariable int id) {
+    public ResponseEntity<Void> deletePerson(@PathVariable int id) {
         chatService.deletePerson(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
